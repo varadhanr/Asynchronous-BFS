@@ -17,6 +17,6 @@ Using Gradle Build tool:
 
 ```shell
 ./gradlew build
-./gradlew run --args = "src/main/java/AsyncBFS/contents/input.txt"
+./gradlew run --args="src/main/java/AsyncBFS/contents/input.txt"
 ```
 
