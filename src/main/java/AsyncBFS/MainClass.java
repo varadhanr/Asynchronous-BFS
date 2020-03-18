@@ -27,7 +27,8 @@ public class MainClass {
 
       try {
         fileScanner = new Scanner(new File(args[0]));
-      } catch (FileNotFoundException e) {
+      }
+      catch (FileNotFoundException e) {
         System.err.println("Error while opening the input file :" + args[0]);
         return;
       }
@@ -44,18 +45,20 @@ public class MainClass {
         Process p = processObject[i];
         for (int j = 0; j < num_of_processes; j++) {
           if (fileScanner.nextInt() == 1 && i != j) {
-            p.addNeighbours(j);
+            p.addNeighbours(processObject[j]);
           }
         }
       }
+      
+      //close the scanner
+      fileScanner.close();
 
       AsynchBFS bfs = new AsynchBFSImpl(rootId, processObject);
       Process rootProcess = bfs.constructBFS();
       
 
-      
-
-    } else {
+    }
+    else {
       System.err.println("Please enter a valid input.txt file");
     }
   }
