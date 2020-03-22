@@ -15,6 +15,8 @@ import java.util.List;
 public class Process {
   
   int processId;
+  int distanceFromRoot;
+  Process parent;
   
   boolean isRoot = false;
   
@@ -25,6 +27,7 @@ public class Process {
   Deque<Message> inMessages; //FIFO queue containing all incoming messages
   
   public Process(int id,boolean isRoot) {
+	distanceFromRoot = Integer.MAX_VALUE;
     this.processId = id;
     this.isRoot = isRoot;
     inMessages = new ArrayDeque<Message>();
@@ -37,7 +40,22 @@ public class Process {
   public boolean isRoot() {
     return isRoot;
   }
-
+  
+  public int getDistanceFromRoot() {
+	  return distanceFromRoot;
+  }
+  
+  public void setDistanceFromRoot(int distance) {
+	  this.distanceFromRoot = distance;
+  }
+  
+  public Process getParent() {
+	  return parent;
+  }
+  
+  public void setParent(Process parent) {
+	  this.parent = parent;
+  }
   
   public void addNeighbours(Process newNeighbor) {
     if(neighbours == null) {
@@ -83,11 +101,15 @@ public class Process {
 	  //send messages based on delays
 	  for (int i = 1; i < 16; i++){
 		for (int j = 0; j < delays.length; j++){
-			if (delays[j] == i)
+			if (delays[j] == i && neighbours.get(j) != this.getParent())
 				sendMessage(message, neighbours.get(j));
 		}
 		Thread.sleep(1);
 	  }
+  }
+  
+  public void sendMessageToParent(Message message) {
+	  this.getParent().inMessages.add(message);
   }
   
   /**Private helper method - sends a message to a single process
