@@ -8,6 +8,7 @@ public class AsynchBFSImpl implements AsynchBFS {
 
   int rootId;
   Process[] processes;
+  boolean done = false;
 
   public AsynchBFSImpl(int rootId,Process[] processess) {
     this.rootId = rootId;
@@ -31,48 +32,69 @@ public class AsynchBFSImpl implements AsynchBFS {
       }
       
       //check message passing
-      Message myMessage = new Message(0, 0, process.getProcessId()); //test message
+      Message myMessage = new Message(0, 0, process); //test message
       try {
-    	if (process.isRoot())
+    	int noOfAckNack = process.getNeighbours().size()-1;
+    	if (process.isRoot()) {
+    		System.out.println("Send message once" + process.getProcessId());
+    		noOfAckNack = process.getNeighbours().size();
+    		process.setDistanceFromRoot(0);
     		process.sendMessageToNeighbours(myMessage);
+    	}
 		//Thread.sleep(1000); //sleep for a second so that everyone gets messages - this is only here to test and should be deleted
 		
-    	int noOfAckNack = process.getNeighbours().size();
 		//read all received message in FIFO order
-		while (true) {
+    	
+		while (!done) {
 			Message thisMessage = process.getFirstMessage();
 			if (thisMessage != null) {
-				if (thisMessage.getMessageType() == 1) {
-					System.out.println("my id: " + process.getProcessId() + " received reject message from: " 
-			    			  + thisMessage.getInitProcessId());
-					noOfAckNack--;
-					if (noOfAckNack == 0) {
-						if (process.isRoot()) {
-							System.out.println("my id: " + process.getProcessId() + " has succesfully built BFS.");
-							break;
+				if (thisMessage.getMessageType() == -1 || thisMessage.getMessageType() == 1) {
+					if (thisMessage.getDistanceFromRoot() != process.getDistanceFromRoot()) {
+						System.out.println("my id: " + process.getProcessId() +" ignores the acnowledgment from " + thisMessage.getInitProcess().getProcessId());
+						System.out.println("Process' distance from root is " + process.getDistanceFromRoot() +" acknowledgements'  distance from root is " + thisMessage.getDistanceFromRoot());
+					}
+					else {
+						if (thisMessage.getMessageType() == -1)
+							System.out.println("my id: " + process.getProcessId() + " received reject message from: " 
+				    			  + thisMessage.getInitProcess().getProcessId());
+						if (thisMessage.getMessageType() == 1)
+							System.out.println("my id: " + process.getProcessId() + " received accept message from: " 
+					    			  + thisMessage.getInitProcess().getProcessId());
+						noOfAckNack--;
+						if (noOfAckNack == 0) {
+							if (process.isRoot()) {
+								System.out.println("my id: " + process.getProcessId() + " has succesfully built BFS.");
+								done =  true;
+							}
+							Message message = new Message(1, thisMessage.getDistanceFromRoot()-1, process);
+							process.sendMessageToParent(message);
 						}
-						Message message = new Message(1, thisMessage.getDistanceFromRoot(), thisMessage.getInitProcessId());
-						process.sendMessageToParent(message);
 					}
 				}
 				else if (process.getDistanceFromRoot() > thisMessage.getDistanceFromRoot()+1) {
 					System.out.println("my id: " + process.getProcessId() + " received message from: " 
-			    			  + thisMessage.getInitProcessId());
+			    			  + thisMessage.getInitProcess().getProcessId());
+					if (process.getDistanceFromRoot() != Integer.MAX_VALUE) {
+						System.out.println("my id: " + process.getProcessId() + " rejected message from: " 
+				    			  + process.getParent().getProcessId());
+						Message message = new Message(-1, process.getDistanceFromRoot()-1, process.getParent());
+						process.sendRejectMessageToSender(message);
+					}
 					process.setDistanceFromRoot(thisMessage.getDistanceFromRoot()+1);
-					process.setParent(processes[thisMessage.getInitProcessId()]);
-					Message message = new Message(0, thisMessage.getDistanceFromRoot()+1, process.getProcessId());
+					process.setParent(thisMessage.getInitProcess());
+					Message message = new Message(0, thisMessage.getDistanceFromRoot()+1, process);
 					if (process.getNeighbours().size() != 1)
 						process.sendMessageToNeighbours(message);
 					else {
-						message = new Message(1, thisMessage.getDistanceFromRoot(), thisMessage.getInitProcessId());
+						message = new Message(1, thisMessage.getDistanceFromRoot(), process);
 						process.sendMessageToParent(message);
 					}
 				}
 				else{
 					System.out.println("my id: " + process.getProcessId() + " rejected message from: " 
-			    			  + thisMessage.getInitProcessId());
-					Message message = new Message(1, thisMessage.getDistanceFromRoot(), thisMessage.getInitProcessId());
-					process.sendMessageToParent(message);
+			    			  + thisMessage.getInitProcess().getProcessId());
+					Message message = new Message(-1, thisMessage.getDistanceFromRoot(), thisMessage.getInitProcess());
+					process.sendRejectMessageToSender(message);
 				}
 			}
 		}

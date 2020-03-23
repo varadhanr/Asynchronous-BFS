@@ -30,6 +30,7 @@ public class Process {
 	distanceFromRoot = Integer.MAX_VALUE;
     this.processId = id;
     this.isRoot = isRoot;
+    this.parent = this;
     inMessages = new ArrayDeque<Message>();
   }
   
@@ -101,8 +102,9 @@ public class Process {
 	  //send messages based on delays
 	  for (int i = 1; i < 16; i++){
 		for (int j = 0; j < delays.length; j++){
-			if (delays[j] == i && neighbours.get(j) != this.getParent())
+			if (delays[j] == i && neighbours.get(j) != this.getParent()) {
 				sendMessage(message, neighbours.get(j));
+			}
 		}
 		Thread.sleep(1);
 	  }
@@ -112,11 +114,16 @@ public class Process {
 	  this.getParent().inMessages.add(message);
   }
   
+  public void sendRejectMessageToSender(Message message) {
+	  Message rejectMessage = new Message(-1, message.distanceFromRoot, this);
+	  message.getInitProcess().inMessages.add(rejectMessage);
+  }
+  
   /**Private helper method - sends a message to a single process
    * @param message the message to send
    * @param process the process to receive the message
    */
-  private void sendMessage(Message message, Process process) {
+  public void sendMessage(Message message, Process process) {
 	  process.inMessages.add(message);
   }
 
