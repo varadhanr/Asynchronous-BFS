@@ -1,8 +1,12 @@
 package AsyncBFS.interfaces;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import AsyncBFS.util.Process;
 
 public interface AsynchBFS {
 
-  public AsyncBFS.util.Process constructBFS();
+  public HashMap<Integer, ArrayList<Integer>> constructBFS(int noOfLinks);
 
 }

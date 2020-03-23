@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
+import AsyncBFS.impl.AsynchBFSImpl.Inte;
+
 /*
  *  
  *  Representation of Process Entity
@@ -89,9 +91,8 @@ public class Process {
    * @param message the message to send to all neighbors
  * @throws InterruptedException since the Thread.sleep() function is being called
    */
-  public void sendMessageToNeighbours(Message message) throws InterruptedException {
+  public void sendMessageToNeighbours(Message message, Inte inte) throws InterruptedException {
 	  int numNeighbors = neighbours.size();
-	  
 	  //calculate a delay for each neighbor
 	  int[] delays = new int[numNeighbors];
 	  for (int i = 0; i < delays.length; i++){
@@ -103,6 +104,7 @@ public class Process {
 	  for (int i = 1; i < 16; i++){
 		for (int j = 0; j < delays.length; j++){
 			if (delays[j] == i && neighbours.get(j) != this.getParent()) {
+				inte.noOfMessages++;
 				sendMessage(message, neighbours.get(j));
 			}
 		}
