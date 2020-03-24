@@ -9,6 +9,14 @@ public class AsynchBFSImpl implements AsynchBFS {
   int rootId;
   Process[] processes;
   boolean done = false;
+  int noOfMessages;
+  int noOfLinks;
+  
+  public class Inte{
+      public int noOfMessages = 0;
+  }
+  
+  Inte inte = new Inte();
 
   public AsynchBFSImpl(int rootId,Process[] processess) {
     this.rootId = rootId;
@@ -39,7 +47,7 @@ public class AsynchBFSImpl implements AsynchBFS {
     		System.out.println("Send message once" + process.getProcessId());
     		noOfAckNack = process.getNeighbours().size();
     		process.setDistanceFromRoot(0);
-    		process.sendMessageToNeighbours(myMessage);
+    		process.sendMessageToNeighbours(myMessage, inte);
     	}
 		//Thread.sleep(1000); //sleep for a second so that everyone gets messages - this is only here to test and should be deleted
 		
@@ -63,10 +71,23 @@ public class AsynchBFSImpl implements AsynchBFS {
 						noOfAckNack--;
 						if (noOfAckNack == 0) {
 							if (process.isRoot()) {
+								System.out.println("Average no of messages sent are " + (float)inte.noOfMessages/noOfLinks + ", " + inte.noOfMessages + ", " + noOfLinks);
 								System.out.println("my id: " + process.getProcessId() + " has succesfully built BFS.");
+								for (int i=0;i<processes.length;i++) {
+									for (int j=0;j<processes.length;j++) {
+										if (processes[i] == processes[j].getParent() || processes[j] == processes[i].getParent()) {
+											System.out.print("1");
+										}
+										else {
+											System.out.print("0");
+										}
+									}
+									System.out.println();
+								}
 								done =  true;
 							}
 							Message message = new Message(1, thisMessage.getDistanceFromRoot()-1, process);
+							inte.noOfMessages++;
 							process.sendMessageToParent(message);
 						}
 					}
@@ -78,15 +99,17 @@ public class AsynchBFSImpl implements AsynchBFS {
 						System.out.println("my id: " + process.getProcessId() + " rejected message from: " 
 				    			  + process.getParent().getProcessId());
 						Message message = new Message(-1, process.getDistanceFromRoot()-1, process.getParent());
+						inte.noOfMessages++;
 						process.sendRejectMessageToSender(message);
 					}
 					process.setDistanceFromRoot(thisMessage.getDistanceFromRoot()+1);
 					process.setParent(thisMessage.getInitProcess());
 					Message message = new Message(0, thisMessage.getDistanceFromRoot()+1, process);
 					if (process.getNeighbours().size() != 1)
-						process.sendMessageToNeighbours(message);
+						process.sendMessageToNeighbours(message, inte);
 					else {
 						message = new Message(1, thisMessage.getDistanceFromRoot(), process);
+						inte.noOfMessages++;
 						process.sendMessageToParent(message);
 					}
 				}
@@ -94,6 +117,7 @@ public class AsynchBFSImpl implements AsynchBFS {
 					System.out.println("my id: " + process.getProcessId() + " rejected message from: " 
 			    			  + thisMessage.getInitProcess().getProcessId());
 					Message message = new Message(-1, thisMessage.getDistanceFromRoot(), thisMessage.getInitProcess());
+					inte.noOfMessages++;
 					process.sendRejectMessageToSender(message);
 				}
 			}
@@ -107,9 +131,9 @@ public class AsynchBFSImpl implements AsynchBFS {
   }
 
   @Override
-  public Process constructBFS() {
+  public Process constructBFS(int totalLinks) {
     
-    
+	noOfLinks = totalLinks;
     for(int i=0;i<processes.length;i++) {
       ProcessThreadObject threadObj = new ProcessThreadObject(processes[i]);
       threadObj.start();

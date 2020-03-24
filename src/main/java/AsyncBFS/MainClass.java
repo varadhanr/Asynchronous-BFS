@@ -18,6 +18,7 @@ public class MainClass {
 
   public static void main(String[] args) {
     int num_of_processes;
+    int noOfLinks = 0;
 
     Process[] processObject;
 
@@ -45,6 +46,7 @@ public class MainClass {
         Process p = processObject[i];
         for (int j = 0; j < num_of_processes; j++) {
           if (fileScanner.nextInt() == 1 && i != j) {
+        	noOfLinks++;
             p.addNeighbours(processObject[j]);
           }
         }
@@ -54,9 +56,9 @@ public class MainClass {
       fileScanner.close();
 
       AsynchBFS bfs = new AsynchBFSImpl(rootId, processObject);
-      Process rootProcess = bfs.constructBFS();
+      Process rootProcess = bfs.constructBFS(noOfLinks/2);
       
-
+      
     }
     else {
       System.err.println("Please enter a valid input.txt file");
