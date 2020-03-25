@@ -36,9 +36,9 @@ public class MainClass {
         return;
       }
 
-      num_of_processes = fileScanner.nextInt();
+      num_of_processes = Integer.valueOf(fileScanner.nextLine());
       processObject = new Process[num_of_processes];
-      int rootId = fileScanner.nextInt();
+      int rootId = Integer.valueOf(fileScanner.nextLine());
 
       for (int i = 0; i < num_of_processes; i++) {
         processObject[i] = new Process(i, i == rootId ? true : false);
@@ -46,10 +46,13 @@ public class MainClass {
 
       for (int i = 0; i < num_of_processes; i++) {
         Process p = processObject[i];
-        for (int j = 0; j < num_of_processes; j++) {
-          if (fileScanner.nextInt() == 1 && i != j) {
-        	noOfLinks++;
-            p.addNeighbours(processObject[j]);
+        if(fileScanner.hasNextLine()) {
+          String[] nextLine = fileScanner.nextLine().split(",");
+          for(int j=0;j<nextLine.length;j++) {
+            if(nextLine[j].trim().equals("1") && i !=j) {
+              noOfLinks++;
+              p.addNeighbours(processObject[j]);
+            }
           }
         }
       }
