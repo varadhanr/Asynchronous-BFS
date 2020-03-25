@@ -2,6 +2,8 @@ package AsyncBFS;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 import AsyncBFS.impl.AsynchBFSImpl;
 import AsyncBFS.interfaces.AsynchBFS;
@@ -56,9 +58,21 @@ public class MainClass {
       fileScanner.close();
 
       AsynchBFS bfs = new AsynchBFSImpl(rootId, processObject);
-      Process rootProcess = bfs.constructBFS(noOfLinks/2);
+      HashMap<Integer, List<Integer>> map = bfs.constructBFS(noOfLinks/2);
       
+      System.out.println("BFS tree rooted at " + rootId +" is:");
+      for(int i=0;i<num_of_processes;i++) {
+    	  List<Integer>childNodes = map.get(processObject[i].getProcessId());
+    	  for (int j=0;j<num_of_processes;j++) {
+    		  if (childNodes.contains(processObject[j].getProcessId()))
+    			  System.out.print("1");
+    		  else
+    			  System.out.print("0");
+   	      }
+    	  System.out.println();
+      }
       
+      System.exit(0);
     }
     else {
       System.err.println("Please enter a valid input.txt file");

@@ -7,7 +7,7 @@ package AsyncBFS.util;
 
 public class Message {
 
-	int messageType; //0 if it is a test message, 1 if it is a response to a test message
+	int messageType; //0 if it is a test message, 1 if it is a response(ACK) to a test message, -1 if it is a response(NACK) to a test message
 	int distanceFromRoot;
 	Process initProcess; //the process id corresponding to the initial sender of the message
 	

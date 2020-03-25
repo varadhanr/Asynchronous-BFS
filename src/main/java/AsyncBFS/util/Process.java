@@ -1,9 +1,9 @@
 package AsyncBFS.util;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import AsyncBFS.impl.AsynchBFSImpl.Inte;
 
@@ -26,14 +26,14 @@ public class Process {
   
   List<Process> childProcess;
   
-  Deque<Message> inMessages; //FIFO queue containing all incoming messages
+  BlockingQueue<Message> inMessages; //FIFO queue containing all incoming messages
   
   public Process(int id,boolean isRoot) {
 	distanceFromRoot = Integer.MAX_VALUE;
     this.processId = id;
     this.isRoot = isRoot;
-    this.parent = this;
-    inMessages = new ArrayDeque<Message>();
+    this.parent = null;
+    inMessages = new ArrayBlockingQueue<Message>(1000);
   }
   
   public int getProcessId() {
@@ -82,6 +82,16 @@ public class Process {
     return this.childProcess;
   }
   
+  public void addMessage(Message message) {
+	  try {
+		  this.inMessages.put(message);
+	  }
+	  catch(InterruptedException e) {
+		  System.out.println(e.toString());
+	  }
+	  
+  }
+  
   
   //message handling
   
@@ -109,17 +119,23 @@ public class Process {
 				sendMessage(message, neighbours.get(j));
 			}
 		}
-		Thread.sleep(1);
+		Thread.sleep(10);
 	  }
   }
   
-  public void sendMessageToParent(Message message) {
-	  this.getParent().inMessages.add(message);
-  }
-  
-  public void sendRejectMessageToSender(Message message) {
-	  Message rejectMessage = new Message(-1, message.distanceFromRoot, this);
-	  message.getInitProcess().inMessages.add(rejectMessage);
+  /**Private helper method - sends a message to a single process
+   * @param message the message to send
+   * @param process the process to receive the message
+   */
+  public void sendMessageToSender(Message message, Process process) throws InterruptedException {
+	  int delay = (int) ((Math.random() * 15) + 1);
+	  Thread.sleep(delay*10);
+	  try {
+		  process.inMessages.put(message);
+	  }
+	  catch(InterruptedException e) {
+		  System.out.println(e.toString());
+	  }
   }
   
   /**Private helper method - sends a message to a single process
@@ -127,11 +143,24 @@ public class Process {
    * @param process the process to receive the message
    */
   public void sendMessage(Message message, Process process) {
-	  process.inMessages.add(message);
+	  try {
+		  process.inMessages.put(message);
+	  }
+	  catch(InterruptedException e) {
+		  System.out.println(e.toString());
+	  }
   }
 
   /** Returns the message at the head of the FIFO queue */
   public Message getFirstMessage(){
-	  return inMessages.poll();
+	  if (!inMessages.isEmpty()) {
+		  try {
+			  return inMessages.take();
+		  }
+		  catch(InterruptedException e) {
+			  System.out.println(e.toString());
+		  }
+	  }
+	  return null;
   }
 }
