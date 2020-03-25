@@ -7,14 +7,14 @@ package AsyncBFS.util;
 
 public class Message {
 
-	int messageType; //0 if it is a test message, 1 if it is a response to a test message
+	int messageType; //0 if it is a test message, 1 if it is a response(ACK) to a test message, -1 if it is a response(NACK) to a test message
 	int distanceFromRoot;
-	int initProcessId; //the process id corresponding to the initial sender of the message
+	Process initProcess; //the process id corresponding to the initial sender of the message
 	
-	public Message(int messageType, int distanceFromRoot, int initProcessId){
+	public Message(int messageType, int distanceFromRoot, Process initProcessId){
 		this.messageType = messageType;
 		this.distanceFromRoot = distanceFromRoot;
-		this.initProcessId = initProcessId;
+		this.initProcess = initProcessId;
 	}
 	
 	public int getMessageType(){
@@ -25,7 +25,7 @@ public class Message {
 		return distanceFromRoot;
 	}
 	
-	public int getInitProcessId(){
-		return initProcessId;
+	public Process getInitProcess(){
+		return initProcess;
 	}
 }
