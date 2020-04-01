@@ -20,3 +20,9 @@ Using Gradle Build tool:
 ./gradlew run --args="src/main/java/AsyncBFS/contents/input.txt"
 ```
 
+Project Details
+---------------
+Course Name : Distributed Computing
+
+Submission by : Madison Pickering (MAP170330), Prameela Parasa (PXP180046) and Varadhan Ramamoorthy (VRR180003)
+
