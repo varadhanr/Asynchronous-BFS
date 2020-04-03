@@ -28,5 +28,5 @@ Submission by : Madison Pickering (MAP170330), Prameela Parasa (PXP180046) and V
 
 Java Docs
 -----------
-[Java docs](https://varadhanr.github.io/Asynchronous-BFS/docs/javadoc/index.html)
+[Java docs](docs/javadoc/index.html)
 
