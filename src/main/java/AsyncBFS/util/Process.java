@@ -96,7 +96,7 @@ public class Process {
   //message handling
   
   /**Sends a message to all neighbors, adding random delays in the time
-   * range of 1 -> 15 milliseconds
+   * range of 1 to 15 milliseconds
    * 
    * @param message the message to send to all neighbors
  * @throws InterruptedException since the Thread.sleep() function is being called
